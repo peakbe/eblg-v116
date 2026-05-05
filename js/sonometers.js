@@ -16,7 +16,7 @@ let heatLayer = null;
 
 // Icône ATC
 const sonoIcon = L.icon({
-    iconUrl: "./assets/icons/sono-atc.png",
+    iconUrl: "/assets/icons/sono-atc.png",
     iconSize: [32, 32],
     iconAnchor: [16, 16],
     popupAnchor: [0, -16]
