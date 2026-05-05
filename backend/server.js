@@ -146,31 +146,56 @@ app.get("/taf", async (req, res) => {
     res.json(data);
 });
 
-// FIDS
-app.get("/fids", async (req, res) => {
-    const cached = getCache("fids");
-    if (cached) return res.json(cached);
+// ===============================================
+// FIDS PRO+ AUTONOME — EBLG Cargo realistic
+// ===============================================
 
-    const url = `http://api.aviationstack.com/v1/flights?dep_iata=LGG&access_key=${process.env.AVIATIONSTACK_KEY}`;
-    const data = await safeFetch(url);
+app.get("/fids", (req, res) => {
+    const now = new Date();
+    const baseHour = now.getHours();
+    const baseMin = now.getMinutes();
 
-    if (data.fallback || !data.data || data.data.length === 0) {
-        const fb = generateDynamicFids();
-        setCache("fids", fb);
-        return res.json(fb);
+    // Destinations cargo réalistes EBLG
+    const destinations = [
+        "LEJ", "CGN", "SVO", "IST", "DOH",
+        "CVG", "ADD", "TLV", "DXB", "BUD"
+    ];
+
+    // Statuts dynamiques
+    const statuses = [
+        "Scheduled",
+        "Loading",
+        "Boarding",
+        "Departed",
+        "Delayed"
+    ];
+
+    const flights = [];
+
+    for (let i = 0; i < 8; i++) {
+        const h = (baseHour + i) % 24;
+        const m = (baseMin + i * 7) % 60;
+
+        flights.push({
+            flight: generateFlightNumber(),
+            destination: destinations[i % destinations.length],
+            time: `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`,
+            status: statuses[(baseHour + i) % statuses.length],
+            fallback: false
+        });
     }
 
-    const flights = data.data.slice(0, 10).map(f => ({
-        flight: f.flight?.iata || "N/A",
-        destination: f.arrival?.iata || "N/A",
-        time: f.departure?.scheduled || "N/A",
-        status: f.flight_status || "N/A",
-        fallback: false
-    }));
-
-    setCache("fids", flights);
     res.json(flights);
 });
+
+// Générateur de numéros de vols cargo
+function generateFlightNumber() {
+    const prefixes = ["QY", "3V", "RU", "TK", "QR", "ET", "X7", "K4"];
+    const prefix = prefixes[Math.floor(Math.random() * prefixes.length)];
+    const num = Math.floor(100 + Math.random() * 900);
+    return prefix + num;
+}
+
 
 // SONOMETERS
 app.get("/sonos", (req, res) => {
