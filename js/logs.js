@@ -1,4 +1,4 @@
-import { API_BASE } from "./config.js";
+import { ENDPOINTS } from "./config.js";
 
 export async function loadLogs() {
     const panel = document.getElementById("logs-panel");
