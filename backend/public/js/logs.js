@@ -5,15 +5,15 @@ export async function loadLogs() {
     if (!panel) return;
 
     try {
-        const res = await fetch(`${API_BASE}/fids`);
         const t0 = performance.now();
+        const res = await fetch(ENDPOINTS.fids);
 
         const ok = res.ok ? "OK" : "ERR";
         const dt = Math.round(performance.now() - t0);
 
         const div = document.createElement("div");
         div.className = "log-entry " + (ok === "OK" ? "log-ok" : "log-error");
-        div.textContent = `${new Date().toLocaleTimeString()} FIDS → ${ok}`;
+        div.textContent = `${new Date().toLocaleTimeString()} FIDS → ${ok} (${dt} ms)`;
         panel.appendChild(div);
 
     } catch (err) {
